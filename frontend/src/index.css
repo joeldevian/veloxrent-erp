@@ -2,37 +2,43 @@
 
 /* ========== CSS VARIABLES ========== */
 :root {
-  --bg-content: #e8e8e8;
-  --bg-sidebar: #1e1e1e;
-  --bg-card: #2e3440;
-  --bg-card-hover: #353d4a;
-  --accent-green: #00c853;
-  --accent-green-dark: #1b5e20;
-  --accent-green-mid: #4CAF50;
-  --accent-orange: #FFA500;
-  --accent-red: #e53935;
-  --btn-primary: #2e7d32;
-  --btn-primary-hover: #1b5e20;
-  --btn-secondary: #FF6F00;
-  --btn-secondary-hover: #E65100;
-  --btn-danger: #e53935;
-  --btn-danger-hover: #c62828;
-  --btn-dark: #2d2d2d;
-  --btn-dark-hover: #424242;
-  --sidebar-active: #3b4a6b;
-  --table-header: #2d2d2d;
-  --input-dark: #263238;
-  --text-white: #ffffff;
-  --text-light: #b0bec5;
-  --text-dark: #212121;
-  --text-muted: #757575;
-  --border-light: #e0e0e0;
-  --border-dark: #424242;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
+  --bg-content: #F8F9FA;
+  --bg-sidebar: #1A1A2E;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F1F5F9;
+  --accent-green: #22C55E;
+  --accent-green-dark: #16A34A;
+  --accent-green-light: #DCFCE7;
+  --accent-orange: #F59E0B;
+  --accent-orange-light: #FEF3C7;
+  --accent-red: #EF4444;
+  --accent-red-light: #FEE2E2;
+  --accent-blue: #3B82F6;
+  --accent-blue-light: #DBEAFE;
+  --accent-gray: #64748B;
+  --accent-gray-light: #F1F5F9;
+  --btn-primary: #22C55E;
+  --btn-primary-hover: #16A34A;
+  --btn-secondary: #3B82F6;
+  --btn-secondary-hover: #2563EB;
+  --btn-danger: #EF4444;
+  --btn-danger-hover: #DC2626;
+  --btn-dark: #334155;
+  --btn-dark-hover: #475569;
+  --sidebar-active: #22C55E;
+  --table-header: #F8FAFC;
+  --input-border: #E2E8F0;
+  --input-focus: #22C55E;
+  --text-white: #FFFFFF;
+  --text-dark: #0F172A;
+  --text-muted: #64748B;
+  --border-light: #E2E8F0;
+  --border-dark: #334155;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --radius-sm: 6px;
-  --radius-md: 10px;
+  --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --transition-fast: 0.15s ease;
@@ -106,7 +112,7 @@ input, select, textarea { font-family: inherit; }
   justify-content: center;
   font-weight: 800;
   font-size: 18px;
-  color: var(--bg-sidebar);
+  color: #FFFFFF;
 }
 
 .sidebar-logo-text {
@@ -122,18 +128,19 @@ input, select, textarea { font-family: inherit; }
 
 .sidebar-search input {
   width: 100%;
-  background: var(--btn-dark);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
   color: var(--text-white);
   padding: 10px 12px 10px 36px;
   font-size: 13px;
   outline: none;
-  transition: border-color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .sidebar-search input:focus {
   border-color: var(--accent-green);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-nav {
@@ -167,7 +174,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 .sidebar-nav-item.active {
-  background: var(--sidebar-active);
+  background: var(--accent-green-dark);
   color: var(--text-white);
   font-weight: 600;
 }
@@ -236,14 +243,16 @@ input, select, textarea { font-family: inherit; }
 .dash-card {
   background: var(--bg-card);
   border-radius: var(--radius-lg);
-  padding: 22px;
-  color: var(--text-white);
+  padding: 24px;
+  color: var(--text-dark);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .dash-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .dash-card-header {
