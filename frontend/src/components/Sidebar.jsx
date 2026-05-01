@@ -7,13 +7,13 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'operator'] },
+  { path: '/', label: 'Inicio', icon: LayoutDashboard, roles: ['admin', 'operator'] },
   { path: '/fleet', label: 'Flota', icon: Car, roles: ['admin', 'operator'] },
   { path: '/clients', label: 'Clientes', icon: Users, roles: ['admin', 'operator'] },
   { path: '/contracts', label: 'Contratos', icon: FileText, roles: ['admin', 'operator'] },
   { path: '/payments', label: 'Caja y Pagos', icon: CreditCard, roles: ['admin', 'operator'] },
   { path: '/vouchers', label: 'Comprobantes', icon: Receipt, roles: ['admin'] },
-  { path: '/crm', label: 'CRM', icon: MessageSquare, roles: ['admin', 'operator'] },
+  { path: '/crm', label: 'Seguimiento', icon: MessageSquare, roles: ['admin', 'operator'] },
   { path: '/reports', label: 'Reportes', icon: BarChart3, roles: ['admin'] },
   { path: '/maintenance', label: 'Mantenimiento', icon: Wrench, roles: ['admin'] },
   { path: '/settings', label: 'Configuración', icon: Settings, roles: ['admin'] },
@@ -28,8 +28,8 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div className="sidebar-logo-icon">V</div>
-        <span className="sidebar-logo-text">Veloxrent</span>
+        <div className="sidebar-logo-icon">A</div>
+        <span className="sidebar-logo-text">AutoRent</span>
       </div>
 
       <nav className="sidebar-nav">

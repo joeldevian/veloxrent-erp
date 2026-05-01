@@ -189,13 +189,13 @@ export default function ContractList() {
         <table className="data-table">
           <thead>
             <tr>
-              <th style={{ color: '#475569', fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Cliente</th>
-              <th style={{ color: '#475569', fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Vehículo</th>
-              <th style={{ color: '#475569', fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Fechas y Destino</th>
-              <th style={{ color: '#475569', fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Plan</th>
-              <th style={{ color: '#475569', fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Estado</th>
-              <th style={{ color: '#475569', fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Total</th>
-              <th style={{ color: '#475569', fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Acciones</th>
+              <th>Cliente</th>
+              <th>Vehículo</th>
+              <th>Fechas y Destino</th>
+              <th>Plan</th>
+              <th>Estado</th>
+              <th>Total</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>

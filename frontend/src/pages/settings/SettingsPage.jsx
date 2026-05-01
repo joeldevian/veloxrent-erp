@@ -158,7 +158,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="form-group" style={{ margin: 0 }}>
                   <label className="form-label" style={{ fontWeight: 700 }}>Razón Social *</label>
-                  <input className="form-input" value={taxConfig.business_name} onChange={e => updateTax('business_name', e.target.value)} placeholder="Veloxrent S.A.C." />
+                  <input className="form-input" value={taxConfig.business_name} onChange={e => updateTax('business_name', e.target.value)} placeholder="AutoRent S.A.C." />
                 </div>
               </div>
 

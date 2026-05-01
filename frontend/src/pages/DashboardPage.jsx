@@ -91,7 +91,7 @@ export default function DashboardPage() {
 
   return (
     <div className="main-content" style={{ paddingBottom: 48 }}>
-      <TopBar title="Dashboard" />
+      <TopBar title="Inicio" />
 
       {/* FILA 1: KPIs COMPACTOS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 20 }}>

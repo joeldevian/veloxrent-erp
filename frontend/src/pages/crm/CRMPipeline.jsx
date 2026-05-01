@@ -36,7 +36,7 @@ export default function CRMPipeline() {
 
   return (
     <div className="main-content">
-      <TopBar title="CRM — Pipeline de Reservas" />
+      <TopBar title="Seguimiento de reservas" />
       {loading ? <div style={{textAlign:'center',padding:60}}>Cargando...</div> : (
         <div style={{display:'flex',gap:16,overflowX:'auto',paddingBottom:20}}>
           {columns.map(col => (

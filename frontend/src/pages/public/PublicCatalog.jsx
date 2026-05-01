@@ -81,7 +81,7 @@ export default function PublicCatalog() {
       {/* Top Bar Contacts */}
       <div style={{ backgroundColor: '#1e1b4b', color: 'white', padding: '8px 24px', fontSize: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-          <span style={{display: 'flex', alignItems: 'center', gap: 6}}><Mail size={14}/> veloxrent.marketing@gmail.com</span>
+          <span style={{display: 'flex', alignItems: 'center', gap: 6}}><Mail size={14}/> autorent.marketing@gmail.com</span>
           <span style={{display: 'flex', alignItems: 'center', gap: 6}}><Phone size={14}/> 925 285 403</span>
           <span style={{display: 'flex', alignItems: 'center', gap: 6}}><MapPin size={14}/> NAZARENAS, Ayacucho 05001</span>
           <span style={{display: 'flex', alignItems: 'center', gap: 6}}><Clock size={14}/> L a S - 7:00 AM a 6:00 PM</span>
@@ -95,7 +95,7 @@ export default function PublicCatalog() {
       <nav style={{ backgroundColor: 'white', padding: '16px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Car size={36} color="#2563eb" />
-          <span style={{ fontSize: 24, fontWeight: 900, color: '#1e3a8a', fontStyle: 'italic', letterSpacing: '-1px' }}>VELOXRENT</span>
+          <span style={{ fontSize: 24, fontWeight: 900, color: '#1e3a8a', fontStyle: 'italic', letterSpacing: '-1px' }}>AUTORENT</span>
         </div>
         <div style={{ display: 'flex', gap: 32, fontWeight: 600, color: '#1e40af', fontSize: 14 }}>
           <a href="#" style={{textDecoration: 'none', color: 'inherit'}}>INICIO</a>

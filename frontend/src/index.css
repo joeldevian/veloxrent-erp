@@ -299,7 +299,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 .data-table thead th {
-  color: var(--text-white);
+  color: #1e293b;
   font-size: 13px;
   font-weight: 600;
   padding: 14px 16px;

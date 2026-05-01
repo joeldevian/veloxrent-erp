@@ -30,8 +30,8 @@ export default function LoginPage() {
       <div className="login-blob login-blob-3"></div>
 
       <div className="login-card animate-slide">
-        <div className="login-logo">VR</div>
-        <h1 className="login-title">Veloxrent ERP</h1>
+        <div className="login-logo">AR</div>
+        <h1 className="login-title">AutoRent ERP</h1>
         <p className="login-subtitle">Sistema de gestión de alquiler de vehículos</p>
 
         <form className="login-form" onSubmit={handleSubmit}>
