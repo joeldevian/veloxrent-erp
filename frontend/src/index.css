@@ -215,13 +215,13 @@ input, select, textarea { font-family: inherit; }
 }
 
 .topbar-clock {
-  background: #111;
-  padding: 8px 18px;
-  border-radius: var(--radius-sm);
+  background: #0f172a;
+  padding: 6px 14px;
+  border-radius: 8px;
   font-family: 'Inter', monospace;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--accent-green);
+  font-size: 15px;
+  font-weight: 700;
+  color: #10b981;
   letter-spacing: 1px;
 }
 

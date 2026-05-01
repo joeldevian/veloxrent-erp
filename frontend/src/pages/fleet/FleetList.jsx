@@ -94,6 +94,24 @@ export default function FleetList() {
 
   const updateField = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
+  const handleFileUpload = (e, field) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateField(field, reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const getVehiclePhoto = (v) => {
+    if (v.photo_url) return v.photo_url;
+    // Fallback mapping based on folder content
+    const brand = v.brand?.trim().replace(/\s+/g, '_');
+    const model = v.model?.trim().replace(/\s+/g, '_');
+    return `/flota_cars/${brand}_${model}.png`;
+  };
+
   return (
     <div className="main-content">
       <TopBar title="Gestión de Flota" />
@@ -141,7 +159,22 @@ export default function FleetList() {
             ) : (
               vehicles.map(v => (
                 <tr key={v.id}>
-                  <td><strong>{v.brand} {v.model}</strong><br/><span style={{fontSize:12,color:'#757575'}}>{v.year} · {v.color}</span></td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 60, height: 40, borderRadius: 6, overflow: 'hidden', background: '#f5f5f5', border: '1px solid #eee' }}>
+                        <img 
+                          src={getVehiclePhoto(v)} 
+                          alt={v.model} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => { e.target.src = 'https://via.placeholder.com/60x40?text=No+Photo'; }}
+                        />
+                      </div>
+                      <div>
+                        <strong>{v.brand} {v.model}</strong><br/>
+                        <span style={{ fontSize: 12, color: '#757575' }}>{v.year} · {v.color}</span>
+                      </div>
+                    </div>
+                  </td>
                   <td><strong>{v.plate}</strong></td>
                   <td style={{textTransform:'capitalize'}}>{v.type}</td>
                   <td>S/ {parseFloat(v.base_price_per_day).toFixed(2)}</td>
@@ -245,6 +278,23 @@ export default function FleetList() {
                 <div className="form-group">
                   <label className="form-label">Venc. Seguro</label>
                   <input className="form-input" type="date" value={form.insurance_expiry} onChange={e => updateField('insurance_expiry', e.target.value)} />
+                </div>
+              </div>
+
+              <div className="form-group" style={{marginTop: 12}}>
+                <label className="form-label">Foto del Vehículo</label>
+                <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                  <div style={{ width: 120, height: 80, borderRadius: 8, overflow: 'hidden', background: '#f8fafc', border: '2px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {form.photo_url || (form.brand && form.model) ? (
+                      <img 
+                        src={getVehiclePhoto(form)} 
+                        alt="Preview" 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/120x80?text=Subir+Foto'; }}
+                      />
+                    ) : <span style={{fontSize:10, color:'#94a3b8'}}>Sin foto</span>}
+                  </div>
+                  <input type="file" className="form-input" accept="image/*" onChange={e => handleFileUpload(e, 'photo_url')} />
                 </div>
               </div>
               <div className="modal-actions">

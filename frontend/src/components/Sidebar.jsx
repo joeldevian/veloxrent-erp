@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   Car, Users, FileText, CreditCard, Receipt, BarChart3,
-  Wrench, Settings, UserCircle, Search, LogOut, LayoutDashboard,
+  Wrench, Settings, LogOut, LayoutDashboard,
   MessageSquare
 } from 'lucide-react';
 
@@ -32,13 +32,6 @@ export default function Sidebar() {
         <span className="sidebar-logo-text">Veloxrent</span>
       </div>
 
-      <div className="sidebar-search">
-        <div style={{ position: 'relative' }}>
-          <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#757575' }} />
-          <input type="text" placeholder="Buscar..." />
-        </div>
-      </div>
-
       <nav className="sidebar-nav">
         {filteredItems.map(item => (
           <NavLink
@@ -54,13 +47,6 @@ export default function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 8px', marginBottom: 4 }}>
-          <UserCircle size={18} style={{ color: '#b0bec5' }} />
-          <div style={{ lineHeight: 1.2 }}>
-            <div style={{ fontSize: 12, fontWeight: 600 }}>{user?.full_name}</div>
-            <div style={{ fontSize: 10, color: '#757575', textTransform: 'capitalize' }}>{user?.role}</div>
-          </div>
-        </div>
         <button className="sidebar-logout" onClick={logout}>
           <LogOut size={16} />
           Cerrar sesión

@@ -15,7 +15,8 @@ const emptyClient = {
   full_name: '', document_type: 'dni', document_number: '', phone: '', email: '',
   client_type: 'local', accommodation_name: '', accommodation_address: '', accommodation_phone: '',
   temporary_address: '', guarantor_full_name: '', guarantor_phone: '', guarantor_document_number: '',
-  guarantor_relationship: '', ruc: '', business_name: '', fiscal_address: '', license_years: '', utility_bill_photo_url: ''
+  guarantor_relationship: '', ruc: '', business_name: '', fiscal_address: '', license_years: '', 
+  utility_bill_photo_url: '', photo_url: ''
 };
 
 export default function ClientList() {
@@ -96,7 +97,7 @@ export default function ClientList() {
   const needsGuarantor = ['foraneo', 'extranjero'].includes(form.client_type);
   const needsAccommodation = ['foraneo', 'extranjero'].includes(form.client_type);
   const needsRUC = form.client_type === 'corporativo';
-  const needsUtilityBill = form.client_type !== 'corporativo';
+  const needsUtilityBill = form.client_type === 'local';
 
   return (
     <div className="main-content">
@@ -215,6 +216,16 @@ export default function ClientList() {
                 )}
               </div>
 
+              <div className="form-group" style={{marginTop: 12}}>
+                <label className="form-label">Foto del Cliente</label>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  {form.photo_url && (
+                    <img src={form.photo_url} alt="Preview" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e2e8f0' }} />
+                  )}
+                  <input type="file" className="form-input" accept="image/*" onChange={e => handleFileUpload(e, 'photo_url')} />
+                </div>
+              </div>
+
               {needsAccommodation && (
                 <>
                   <h3 style={{fontSize:14,fontWeight:700,marginBottom:12,marginTop:8,color:'#424242'}}>Datos de Hospedaje o Domicilio Temporal (Obligatorio)</h3>
@@ -307,13 +318,23 @@ export default function ClientList() {
             </button>
             
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32, marginTop: 12 }}>
-              <svg width="140" height="140" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="46" fill="#f0f2f5" stroke="#3b4a6b" strokeWidth="4"/>
-                <circle cx="50" cy="38" r="18" fill="#3b4a6b"/>
-                <path d="M 24 84 C 24 62, 34 56, 50 56 C 66 56, 76 62, 76 84" fill="#3b4a6b"/>
-                <path d="M 46 56 L 54 56 L 57 84 L 43 84 Z" fill="#69f0ae"/>
-                <path d="M 43 84 L 50 90 L 57 84 Z" fill="#69f0ae"/>
-              </svg>
+              <div style={{ width: 140, height: 140, borderRadius: '50%', background: '#f8fafc', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px rgba(0,0,0,0.1)', border: '4px solid white' }}>
+                {viewingClient.photo_url ? (
+                  <img src={viewingClient.photo_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : viewingClient.client_type === 'corporativo' ? (
+                  <img src="/customers/empresa.png" alt="Empresa" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (['foraneo', 'extranjero'].includes(viewingClient.client_type)) ? (
+                  <img src="/customers/turista.png" alt="Turista" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : viewingClient.client_type === 'local' ? (
+                  <img src="/customers/hombre_cliente_uno.png" alt="Local" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <svg width="100%" height="100%" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50" fill="#f0f2f5"/>
+                    <circle cx="50" cy="38" r="18" fill="#3b4a6b"/>
+                    <path d="M 24 84 C 24 62, 34 56, 50 56 C 66 56, 76 62, 76 84" fill="#3b4a6b"/>
+                  </svg>
+                )}
+              </div>
               <h2 style={{fontSize: 26, fontWeight: 800, marginTop: 16, color: '#212121', letterSpacing: '-0.5px'}}>{viewingClient.full_name}</h2>
               <div style={{ color: '#757575', fontSize: 15, display: 'flex', gap: 12, alignItems: 'center', marginTop: 8 }}>
                 <span style={{textTransform:'capitalize', fontWeight: 600}}>{viewingClient.client_type}</span>

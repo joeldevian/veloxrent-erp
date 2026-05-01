@@ -13,7 +13,7 @@ export default function SettingsPage() {
   });
   const [users, setUsers] = useState([]);
   const [showUserModal, setShowUserModal] = useState(false);
-  const [userForm, setUserForm] = useState({ full_name: '', email: '', password: '', role: 'operator' });
+  const [userForm, setUserForm] = useState({ full_name: '', email: '', password: '', role: 'operator', photo_url: '' });
   const [editingUser, setEditingUser] = useState(null);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -71,7 +71,7 @@ export default function SettingsPage() {
       }
       setShowUserModal(false);
       setEditingUser(null);
-      setUserForm({ full_name: '', email: '', password: '', role: 'operator' });
+      setUserForm({ full_name: '', email: '', password: '', role: 'operator', photo_url: '' });
       loadUsers();
       Toast.fire({ icon: 'success', title: 'Usuario guardado' });
     } catch (err) {
@@ -83,7 +83,7 @@ export default function SettingsPage() {
 
   const openEditUser = (u) => {
     setEditingUser(u);
-    setUserForm({ full_name: u.full_name, email: u.email, password: '', role: u.role });
+    setUserForm({ full_name: u.full_name, email: u.email, password: '', role: u.role, photo_url: u.photo_url || '' });
     setShowUserModal(true);
   };
 
@@ -100,6 +100,15 @@ export default function SettingsPage() {
       Toast.fire({ icon: 'success', title: `Usuario ${isActive ? 'desactivado' : 'activado'}` });
     } catch (e) {
       showAlert('Error al actualizar usuario', 'error');
+    }
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setUserForm(p => ({ ...p, photo_url: reader.result }));
+      reader.readAsDataURL(file);
     }
   };
 
@@ -188,7 +197,7 @@ export default function SettingsPage() {
       ) : (
         <div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-            <button className="btn btn-primary" onClick={() => { setEditingUser(null); setUserForm({ full_name: '', email: '', password: '', role: 'operator' }); setShowUserModal(true); }}>
+            <button className="btn btn-primary" onClick={() => { setEditingUser(null); setUserForm({ full_name: '', email: '', password: '', role: 'operator', photo_url: '' }); setShowUserModal(true); }}>
               <Plus size={16} /> Nuevo Usuario
             </button>
           </div>
@@ -198,8 +207,18 @@ export default function SettingsPage() {
               <div key={u.id} style={{ background: 'white', borderRadius: 16, padding: 24, display: 'flex', position: 'relative', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
                 {/* Left part: Avatar and details */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                  <div style={{ width: 90, height: 90, borderRadius: '50%', background: '#3b4a6b', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
-                    <User size={48} />
+                  <div style={{ width: 90, height: 90, borderRadius: '50%', background: '#f8fafc', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, boxShadow: '0 4px 8px rgba(0,0,0,0.1)', border: '2px solid #e2e8f0' }}>
+                    {u.photo_url ? (
+                      <img src={u.photo_url} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : u.full_name === 'Admin Principal' ? (
+                      <img src="/user/administrador.png" alt="Admin" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : u.full_name === 'Operador Turno Mañana' ? (
+                      <img src="/user/operador_uno.png" alt="Operador" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ background: '#3b4a6b', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                        <User size={48} />
+                      </div>
+                    )}
                   </div>
                   <div style={{ fontWeight: 700, fontSize: 18, color: '#212121', marginBottom: 4 }}>{u.full_name}</div>
                   <div style={{ fontSize: 13, color: '#757575', marginBottom: 12 }}>{u.email}</div>
@@ -253,6 +272,15 @@ export default function SettingsPage() {
                       <option value="operator">Operador</option>
                       <option value="admin">Administrador</option>
                     </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Foto de Perfil</label>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                      {userForm.photo_url && (
+                        <img src={userForm.photo_url} alt="Preview" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover' }} />
+                      )}
+                      <input type="file" className="form-input" accept="image/*" onChange={handlePhotoChange} />
+                    </div>
                   </div>
                   <div className="modal-actions">
                     <button type="button" className="btn btn-outline" onClick={() => setShowUserModal(false)}>Cancelar</button>

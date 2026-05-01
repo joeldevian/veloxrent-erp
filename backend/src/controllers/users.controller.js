@@ -3,11 +3,11 @@ const bcrypt = require('bcryptjs');
 
 async function create(req, res) {
   try {
-    const { full_name, email, password, role } = req.body;
+    const { full_name, email, password, role, photo_url } = req.body;
     const password_hash = await bcrypt.hash(password, 10);
     const { data, error } = await supabase.from('users').insert([{
-      full_name, email: email.toLowerCase().trim(), password_hash, role: role || 'operator'
-    }]).select('id, full_name, email, role, is_active, created_at').single();
+      full_name, email: email.toLowerCase().trim(), password_hash, role: role || 'operator', photo_url
+    }]).select('id, full_name, email, role, is_active, photo_url, created_at').single();
 
     if (error) {
       if (error.code === '23505') return res.status(409).json({ error: true, message: 'El email ya está registrado' });
@@ -28,7 +28,7 @@ async function update(req, res) {
     }
     const { data, error } = await supabase.from('users')
       .update(updateData).eq('id', req.params.id)
-      .select('id, full_name, email, role, is_active').single();
+      .select('id, full_name, email, role, is_active, photo_url').single();
     if (error) throw error;
     res.json({ error: false, message: 'Usuario actualizado', data });
   } catch (error) {
@@ -51,7 +51,7 @@ async function deactivate(req, res) {
 async function getAll(req, res) {
   try {
     const { data, error } = await supabase.from('users')
-      .select('id, full_name, email, role, is_active, created_at').order('created_at', { ascending: false });
+      .select('id, full_name, email, role, is_active, photo_url, created_at').order('created_at', { ascending: false });
     if (error) throw error;
     res.json({ error: false, data });
   } catch (error) {

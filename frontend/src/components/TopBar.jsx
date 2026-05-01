@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { contractService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function TopBar({ title }) {
   const [time, setTime] = useState(new Date());
@@ -9,6 +10,7 @@ export default function TopBar({ title }) {
   const [alertsData, setAlertsData] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [lastSeen, setLastSeen] = useState(localStorage.getItem('last_seen_alerts') || '0');
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -82,7 +84,16 @@ export default function TopBar({ title }) {
             </div>
           )}
         </div>
-        <div className="topbar-clock">{formatTime(time)}</div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRight: '1px solid #e2e8f0' }}>
+            <UserCircle size={20} style={{ color: '#64748b' }} />
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', textTransform: 'capitalize' }}>
+              {user?.role}
+            </div>
+          </div>
+          <div className="topbar-clock">{formatTime(time)}</div>
+        </div>
       </div>
     </div>
   );
