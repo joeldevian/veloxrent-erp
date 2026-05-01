@@ -11,11 +11,31 @@ const STATUS_MAP = {
   inactivo: 'badge-orange', bloqueado: 'badge-red'
 };
 
+const AVATAR_COLORS = [
+  '#16A34A', '#2563EB', '#D97706', '#DC2626', '#7C3AED',
+  '#0891B2', '#DB2777', '#059669', '#EA580C', '#4F46E5',
+  '#0D9488', '#C026D3', '#65A30D', '#E11D48', '#0284C7'
+];
+
+const getInitials = (name) => {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return parts[0][0].toUpperCase();
+};
+
+const getAvatarColor = (name) => {
+  if (!name) return AVATAR_COLORS[0];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+};
+
 const emptyClient = {
   full_name: '', document_type: 'dni', document_number: '', phone: '', email: '',
   client_type: 'local', accommodation_name: '', accommodation_address: '', accommodation_phone: '',
   temporary_address: '', guarantor_full_name: '', guarantor_phone: '', guarantor_document_number: '',
-  guarantor_relationship: '', ruc: '', business_name: '', fiscal_address: '', license_years: '', 
+  guarantor_relationship: '', ruc: '', business_name: '', fiscal_address: '', license_years: '',
   utility_bill_photo_url: '', photo_url: ''
 };
 
@@ -118,15 +138,15 @@ export default function ClientList() {
 
       <div className="page-header">
         <div className="filter-bar">
-          <form onSubmit={handleSearch} style={{display:'flex',gap:8}}>
-            <input placeholder="Buscar nombre, DNI o teléfono..." value={search} onChange={e => setSearch(e.target.value)} style={{width:260}} />
+          <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8 }}>
+            <input placeholder="Buscar nombre, DNI o teléfono..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: 260 }} />
             <button className="btn btn-dark" type="submit"><Search size={16} /></button>
           </form>
-          <select value={filter.client_type} onChange={e => setFilter(p => ({...p, client_type: e.target.value}))}>
+          <select value={filter.client_type} onChange={e => setFilter(p => ({ ...p, client_type: e.target.value }))}>
             <option value="">Todos los tipos</option>
             {CLIENT_TYPES.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
           </select>
-          <select value={filter.client_status} onChange={e => setFilter(p => ({...p, client_status: e.target.value}))}>
+          <select value={filter.client_status} onChange={e => setFilter(p => ({ ...p, client_status: e.target.value }))}>
             <option value="">Estado CRM</option>
             <option value="prospecto">Prospecto</option>
             <option value="activo">Activo</option>
@@ -155,23 +175,19 @@ export default function ClientList() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="6" style={{textAlign:'center',padding:40}}>Cargando...</td></tr>
+              <tr><td colSpan="6" style={{ textAlign: 'center', padding: 40 }}>Cargando...</td></tr>
             ) : clients.length === 0 ? (
-              <tr><td colSpan="6" style={{textAlign:'center',padding:40,color:'#757575'}}>No hay clientes registrados</td></tr>
+              <tr><td colSpan="6" style={{ textAlign: 'center', padding: 40, color: '#757575' }}>No hay clientes registrados</td></tr>
             ) : (
               clients.map(c => (
                 <tr key={c.id}>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: c.photo_url ? '#F1F5F9' : getAvatarColor(c.full_name), display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
                         {c.photo_url ? (
                           <img src={c.photo_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : c.client_type === 'corporativo' ? (
-                          <img src="/customers/empresa.png" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : ['foraneo', 'extranjero'].includes(c.client_type) ? (
-                          <img src="/customers/turista.png" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <img src="/customers/hombre_cliente_uno.png" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <span style={{ color: 'white', fontSize: 15, fontWeight: 800, letterSpacing: 1 }}>{getInitials(c.full_name)}</span>
                         )}
                       </div>
                       <div>
@@ -184,14 +200,14 @@ export default function ClientList() {
                     <div style={{ fontSize: 13, color: '#334155' }}>{c.phone}</div>
                     <div style={{ fontSize: 12, color: '#64748B' }}>{c.email || '—'}</div>
                   </td>
-                  <td style={{textTransform:'capitalize', color: '#334155'}}>{c.client_type}</td>
+                  <td style={{ textTransform: 'capitalize', color: '#334155' }}>{c.client_type}</td>
                   <td><span className={`badge ${STATUS_MAP[c.client_status] || 'badge-gray'}`}>{c.client_status}</span></td>
                   <td>
-                    <div style={{display:'flex',gap:6}}>
+                    <div style={{ display: 'flex', gap: 6 }}>
                       <button className="btn-icon btn-dark" onClick={() => openProfile(c.id)} title="Ver Ficha 360°">
-                        {profileLoading ? <RefreshCw size={14} className="spin" color="white"/> : <Eye size={14} color="white"/>}
+                        {profileLoading ? <RefreshCw size={14} className="spin" color="white" /> : <Eye size={14} color="white" />}
                       </button>
-                      <button className="btn-icon btn-outline" onClick={() => openEdit(c)} title="Editar"><Edit size={14}/></button>
+                      <button className="btn-icon btn-outline" onClick={() => openEdit(c)} title="Editar"><Edit size={14} /></button>
                     </div>
                   </td>
                 </tr>
@@ -203,10 +219,10 @@ export default function ClientList() {
 
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth:720,maxHeight:'90vh', padding: 32}}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 720, maxHeight: '90vh', padding: 32 }}>
             <div className="modal-header" style={{ marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid #E2E8F0' }}>
               <h2 className="modal-title" style={{ fontSize: 20, fontWeight: 800 }}>{editingClient ? 'Editar Cliente' : 'Nuevo Cliente'}</h2>
-              <button className="modal-close" onClick={() => setShowModal(false)}><X size={20}/></button>
+              <button className="modal-close" onClick={() => setShowModal(false)}><X size={20} /></button>
             </div>
             <form onSubmit={handleSave}>
               <div className="form-row">
@@ -247,19 +263,19 @@ export default function ClientList() {
                   <label className="form-label">Años de Licencia *</label>
                   <input className="form-input" type="number" required min="0" value={form.license_years} onChange={e => updateField('license_years', e.target.value === '' ? '' : parseInt(e.target.value))} />
                   {form.license_years !== '' && form.license_years < 2 && (
-                    <div style={{color:'#EF4444',fontSize:12,marginTop:4,fontWeight:600}}>⚠ Deseable 2+ años. Requiere validación manual.</div>
+                    <div style={{ color: '#EF4444', fontSize: 12, marginTop: 4, fontWeight: 600 }}>⚠ Deseable 2+ años. Requiere validación manual.</div>
                   )}
                 </div>
                 {needsUtilityBill && (
                   <div className="form-group">
                     <label className="form-label">Foto Recibo (Agua o Luz) *</label>
                     <input className="form-input" type="file" accept="image/*" required={!form.utility_bill_photo_url} onChange={e => handleFileUpload(e, 'utility_bill_photo_url')} />
-                    {form.utility_bill_photo_url && <div style={{fontSize: 12, color: '#22C55E', marginTop: 4, fontWeight: 600}}>✓ Imagen cargada</div>}
+                    {form.utility_bill_photo_url && <div style={{ fontSize: 12, color: '#22C55E', marginTop: 4, fontWeight: 600 }}>✓ Imagen cargada</div>}
                   </div>
                 )}
               </div>
 
-              <div className="form-group" style={{marginTop: 12}}>
+              <div className="form-group" style={{ marginTop: 12 }}>
                 <label className="form-label">Foto del Cliente</label>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                   {form.photo_url && (
@@ -271,7 +287,7 @@ export default function ClientList() {
 
               {needsAccommodation && (
                 <>
-                  <h3 style={{fontSize:14,fontWeight:700,marginBottom:12,marginTop:8,color:'#334155'}}>Datos de Hospedaje o Domicilio Temporal (Obligatorio)</h3>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, marginTop: 8, color: '#334155' }}>Datos de Hospedaje o Domicilio Temporal (Obligatorio)</h3>
                   <div className="form-row-3">
                     <div className="form-group">
                       <label className="form-label">Hospedaje o Domicilio *</label>
@@ -291,7 +307,7 @@ export default function ClientList() {
 
               {needsGuarantor && (
                 <>
-                  <h3 style={{fontSize:14,fontWeight:700,marginBottom:12,marginTop:8,color:'#334155'}}>Datos del Garante (Obligatorio)</h3>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, marginTop: 8, color: '#334155' }}>Datos del Garante (Obligatorio)</h3>
                   <div className="form-row">
                     <div className="form-group">
                       <label className="form-label">Nombre del Garante *</label>
@@ -323,7 +339,7 @@ export default function ClientList() {
 
               {needsRUC && (
                 <>
-                  <h3 style={{fontSize:14,fontWeight:700,marginBottom:12,marginTop:8,color:'#334155'}}>Datos de Facturación</h3>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, marginTop: 8, color: '#334155' }}>Datos de Facturación</h3>
                   <div className="form-row-3">
                     <div className="form-group">
                       <label className="form-label">RUC</label>
@@ -355,29 +371,25 @@ export default function ClientList() {
       {/* FICHA 360° */}
       {viewingClient && (
         <div className="modal-overlay" onClick={() => setViewingClient(null)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 1000, width: '95%', padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '90vh'}}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 1000, width: '95%', padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '90vh' }}>
             <div style={{ background: '#0F172A', padding: '32px 40px', position: 'relative', display: 'flex', gap: 24, alignItems: 'center' }}>
-              <button className="modal-close" style={{position: 'absolute', top: 24, right: 24}} onClick={() => setViewingClient(null)}>
-                <X size={24} color="#94A3B8"/>
+              <button className="modal-close" style={{ position: 'absolute', top: 24, right: 24 }} onClick={() => setViewingClient(null)}>
+                <X size={24} color="#94A3B8" />
               </button>
-              
-              <div style={{ width: 100, height: 100, borderRadius: '50%', background: '#F8FAFC', overflow: 'hidden', border: '4px solid #334155', flexShrink: 0 }}>
+
+              <div style={{ width: 100, height: 100, borderRadius: '50%', background: viewingClient.photo_url ? '#F8FAFC' : getAvatarColor(viewingClient.full_name), overflow: 'hidden', border: '4px solid #334155', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {viewingClient.photo_url ? (
                   <img src={viewingClient.photo_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : viewingClient.client_type === 'corporativo' ? (
-                  <img src="/customers/empresa.png" alt="Empresa" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (['foraneo', 'extranjero'].includes(viewingClient.client_type)) ? (
-                  <img src="/customers/turista.png" alt="Turista" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
-                  <img src="/customers/hombre_cliente_uno.png" alt="Local" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <span style={{ color: 'white', fontSize: 36, fontWeight: 800, letterSpacing: 2 }}>{getInitials(viewingClient.full_name)}</span>
                 )}
               </div>
-              
+
               <div style={{ color: 'white' }}>
-                <h2 style={{fontSize: 28, fontWeight: 800, marginBottom: 4}}>{viewingClient.full_name}</h2>
+                <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 4 }}>{viewingClient.full_name}</h2>
                 <div style={{ display: 'flex', gap: 16, alignItems: 'center', fontSize: 14, color: '#94A3B8' }}>
-                  <span style={{textTransform:'capitalize'}}>{viewingClient.client_type}</span>
-                  <span style={{width: 4, height: 4, background: '#475569', borderRadius: '50%'}}></span>
+                  <span style={{ textTransform: 'capitalize' }}>{viewingClient.client_type}</span>
+                  <span style={{ width: 4, height: 4, background: '#475569', borderRadius: '50%' }}></span>
                   <span className={`badge ${STATUS_MAP[viewingClient.client_status] || 'badge-gray'}`}>{viewingClient.client_status}</span>
                 </div>
               </div>
@@ -399,24 +411,24 @@ export default function ClientList() {
             <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
               {/* Left Column: Details */}
               <div style={{ width: 340, background: '#F8FAFC', borderRight: '1px solid #E2E8F0', padding: 32, overflowY: 'auto' }}>
-                <h3 style={{fontSize:14, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: 16}}>Datos Personales</h3>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: 16 }}>Datos Personales</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 32 }}>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <FileText size={18} color="#94A3B8" style={{ marginTop: 2 }}/>
+                    <FileText size={18} color="#94A3B8" style={{ marginTop: 2 }} />
                     <div>
                       <div style={{ fontSize: 12, color: '#64748B' }}>{viewingClient.document_type?.toUpperCase()}</div>
                       <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600 }}>{viewingClient.document_number}</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <Phone size={18} color="#94A3B8" style={{ marginTop: 2 }}/>
+                    <Phone size={18} color="#94A3B8" style={{ marginTop: 2 }} />
                     <div>
                       <div style={{ fontSize: 12, color: '#64748B' }}>Teléfono</div>
                       <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600 }}>{viewingClient.phone}</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <Mail size={18} color="#94A3B8" style={{ marginTop: 2 }}/>
+                    <Mail size={18} color="#94A3B8" style={{ marginTop: 2 }} />
                     <div>
                       <div style={{ fontSize: 12, color: '#64748B' }}>Email</div>
                       <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600 }}>{viewingClient.email || '—'}</div>
@@ -424,14 +436,14 @@ export default function ClientList() {
                   </div>
                 </div>
 
-                <h3 style={{fontSize:14, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: 16}}>Estado de Documentación</h3>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: 16 }}>Estado de Documentación</h3>
                 <div style={{ background: 'white', borderRadius: 8, border: '1px solid #E2E8F0', padding: 16, marginBottom: 32 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <span style={{ fontSize: 13, fontWeight: 600 }}>Licencia Conducir</span>
                     {viewingClient.license_years >= 2 ? (
                       <span className="badge badge-green">Válida ({viewingClient.license_years} años)</span>
                     ) : (
-                      <span className="badge badge-red" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AlertTriangle size={12}/> Alerta ({viewingClient.license_years} años)</span>
+                      <span className="badge badge-red" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AlertTriangle size={12} /> Alerta ({viewingClient.license_years} años)</span>
                     )}
                   </div>
                   {viewingClient.utility_bill_photo_url && (
@@ -444,10 +456,10 @@ export default function ClientList() {
 
                 {['foraneo', 'extranjero'].includes(viewingClient.client_type) && (
                   <>
-                    <h3 style={{fontSize:14, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: 16}}>Hospedaje y Garante</h3>
+                    <h3 style={{ fontSize: 14, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: 16 }}>Hospedaje y Garante</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                        <MapPin size={18} color="#94A3B8" style={{ marginTop: 2 }}/>
+                        <MapPin size={18} color="#94A3B8" style={{ marginTop: 2 }} />
                         <div>
                           <div style={{ fontSize: 12, color: '#64748B' }}>Hospedaje</div>
                           <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600 }}>{viewingClient.accommodation_name || '—'}</div>
@@ -455,7 +467,7 @@ export default function ClientList() {
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                        <Users size={18} color="#94A3B8" style={{ marginTop: 2 }}/>
+                        <Users size={18} color="#94A3B8" style={{ marginTop: 2 }} />
                         <div>
                           <div style={{ fontSize: 12, color: '#64748B' }}>Garante ({viewingClient.guarantor_relationship})</div>
                           <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600 }}>{viewingClient.guarantor_full_name || '—'}</div>
@@ -473,7 +485,7 @@ export default function ClientList() {
                   <button style={{ flex: 1, padding: 16, background: 'white', border: 'none', borderBottom: '2px solid #22C55E', fontWeight: 700, color: '#0F172A' }}>Historial de Contratos</button>
                   <button style={{ flex: 1, padding: 16, background: '#F8FAFC', border: 'none', borderBottom: '2px solid transparent', fontWeight: 600, color: '#64748B' }}>Timeline CRM (Próximamente)</button>
                 </div>
-                
+
                 <div style={{ padding: 32, overflowY: 'auto', flex: 1 }}>
                   {viewingClient.contracts?.length === 0 ? (
                     <div style={{ textAlign: 'center', color: '#94A3B8', marginTop: 40 }}>Este cliente aún no tiene contratos registrados.</div>
@@ -483,12 +495,12 @@ export default function ClientList() {
                         <div key={c.id} style={{ border: '1px solid #E2E8F0', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
-                              <span style={{ fontWeight: 700, color: '#0F172A' }}>Vehículo ID: {c.vehicle_id?.substring(0,8)}</span>
+                              <span style={{ fontWeight: 700, color: '#0F172A' }}>Vehículo ID: {c.vehicle_id?.substring(0, 8)}</span>
                               <span className="badge badge-gray" style={{ textTransform: 'capitalize' }}>Plan {c.plan}</span>
                             </div>
                             <div style={{ fontSize: 13, color: '#64748B', display: 'flex', gap: 16 }}>
-                              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={14}/> {new Date(c.start_datetime).toLocaleDateString()}</span>
-                              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={14}/> {c.trip_destination || '—'}</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={14} /> {new Date(c.start_datetime).toLocaleDateString()}</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={14} /> {c.trip_destination || '—'}</span>
                             </div>
                           </div>
                           <div style={{ textAlign: 'right' }}>
