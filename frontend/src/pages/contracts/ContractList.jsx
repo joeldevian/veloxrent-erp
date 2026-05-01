@@ -3,7 +3,7 @@ import FuelSelector from '../../components/FuelSelector';
 import { useState, useEffect, useMemo } from 'react';
 import { contractService, vehicleService, clientService } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { Plus, RefreshCw, CheckCircle, X, PlayCircle, StopCircle, AlertTriangle, Eye, FileText, ChevronRight, ChevronLeft, MapPin, Calendar, Clock, Car } from 'lucide-react';
+import { Plus, RefreshCw, CheckCircle, X, PlayCircle, StopCircle, AlertTriangle, Eye, FileText, ChevronRight, ChevronLeft, MapPin, Calendar, Clock, Car, Users, Receipt } from 'lucide-react';
 import { Toast, showAlert, showConfirm, showPrompt } from '../../utils/alert';
 
 const STATUS_MAP = { pending:'badge-orange', confirmed:'badge-blue', active:'badge-green', closed:'badge-gray', cancelled:'badge-red', incident:'badge-red' };
@@ -138,6 +138,22 @@ export default function ContractList() {
     return new Date(dateStr) < new Date();
   };
 
+  const getVehiclePhoto = (v) => {
+    if (!v) return '/flota_cars/car-placeholder.png';
+    if (v.photo_url) return v.photo_url;
+    const brand = v.brand?.trim().replace(/\s+/g, '_');
+    const model = v.model?.trim().replace(/\s+/g, '_');
+    return `/flota_cars/${brand}_${model}.png`;
+  };
+
+  const getClientPhoto = (c) => {
+    if (!c) return '/customers/hombre_cliente_uno.png';
+    if (c.photo_url) return c.photo_url;
+    if (c.client_type === 'corporativo') return '/customers/empresa.png';
+    if (['foraneo', 'extranjero'].includes(c.client_type)) return '/customers/turista.png';
+    return '/customers/hombre_cliente_uno.png';
+  };
+
   return (
     <div className="main-content">
       <TopBar title="Contratos y Reservas" />
@@ -229,9 +245,9 @@ export default function ContractList() {
       {/* MODAL CREAR RESERVA (STEPPER) */}
       {showCreate && (
         <div className="modal-overlay" onClick={()=>setShowCreate(false)}>
-          <div className="modal-content" onClick={e=>e.stopPropagation()} style={{maxWidth:800, padding: 0, overflow: 'hidden'}}>
+          <div className="modal-content" onClick={e=>e.stopPropagation()} style={{maxWidth:800, width: '95%', padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '90vh'}}>
             
-            <div style={{ background: '#0F172A', padding: '24px 32px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ background: '#0F172A', padding: '20px 32px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
               <div>
                 <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Nueva Reserva</h2>
                 <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 4, margin: 0 }}>Paso {step} de 4</p>
@@ -239,7 +255,7 @@ export default function ContractList() {
               <button style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={()=>setShowCreate(false)}><X size={24} color="#94A3B8"/></button>
             </div>
 
-            <div style={{ display: 'flex', background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', padding: '16px 32px', gap: 12 }}>
+            <div style={{ display: 'flex', background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', padding: '16px 32px', gap: 12, flexShrink: 0 }}>
               {[1,2,3,4].map(num => (
                 <div key={num} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <div style={{ height: 4, background: step >= num ? '#22C55E' : '#E2E8F0', borderRadius: 2 }}></div>
@@ -250,7 +266,7 @@ export default function ContractList() {
               ))}
             </div>
 
-            <div style={{ padding: 32, maxHeight: '60vh', overflowY: 'auto' }}>
+            <div style={{ padding: 32, overflowY: 'auto', flex: 1 }}>
               
               {/* PASO 1: VEHICULO Y FECHAS */}
               {step === 1 && (
@@ -436,7 +452,7 @@ export default function ContractList() {
             </div>
 
             {/* Modal Footer Controls */}
-            <div style={{ padding: '24px 32px', background: 'white', borderTop: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ padding: '20px 32px', background: 'white', borderTop: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', flexShrink: 0 }}>
               {step > 1 ? (
                 <button className="btn btn-outline" style={{ display: 'flex', gap: 8, alignItems: 'center' }} onClick={()=>setStep(s=>s-1)}>
                   <ChevronLeft size={16}/> Atrás
@@ -597,6 +613,167 @@ export default function ContractList() {
                 <button type="submit" className="btn btn-primary" style={{ background: '#0F172A' }} disabled={saving}>{saving?'Procesando...':'Calcular Total y Cerrar Contrato'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* MODAL VER DETALLES (OJITO) */}
+      {viewingContract && (
+        <div className="modal-overlay" onClick={()=>setViewingContract(null)}>
+          <div className="modal-content" onClick={e=>e.stopPropagation()} style={{maxWidth:900, width:'95%', padding:0, overflow:'hidden', display:'flex', flexDirection:'column', maxHeight:'90vh'}}>
+            
+            <div style={{ background: '#0F172A', padding: '24px 32px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+              <div>
+                <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Detalles del Contrato</h2>
+                <div style={{ display: 'flex', gap: 12, marginTop: 4, alignItems: 'center' }}>
+                  <span className={`badge ${STATUS_MAP[viewingContract.status]}`} style={{fontSize:11}}>{STATUS_LABELS[viewingContract.status]}</span>
+                  <span style={{ fontSize: 13, color: '#94A3B8' }}>ID: {viewingContract.id.substring(0,8)}</span>
+                </div>
+              </div>
+              <button style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={()=>setViewingContract(null)}><X size={24} color="#94A3B8"/></button>
+            </div>
+
+            <div style={{ padding: 32, overflowY: 'auto', flex: 1, background: '#F8FAFC' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+                
+                {/* Columna Izquierda: Información Principal */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  
+                  {/* Card Cliente */}
+                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E2E8F0', padding: 24 }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Users size={16}/> Información del Cliente
+                    </h3>
+                    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                      <div style={{ width: 64, height: 64, background: '#F1F5F9', borderRadius: '50%', overflow: 'hidden', border: '2px solid #E2E8F0' }}>
+                        <img src={getClientPhoto(viewingContract.clients)} style={{width:'100%', height:'100%', objectFit:'cover'}}/>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: '#0F172A' }}>{viewingContract.clients?.full_name}</div>
+                        <div style={{ fontSize: 14, color: '#64748B' }}>DNI: {viewingContract.clients?.document_number}</div>
+                        <div style={{ fontSize: 14, color: '#64748B' }}>Telf: {viewingContract.clients?.phone}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Vehículo */}
+                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E2E8F0', padding: 24 }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Car size={16}/> Vehículo Asignado
+                    </h3>
+                    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                      <div style={{ width: 100, height: 60, background: '#F1F5F9', borderRadius: 8, overflow: 'hidden', border: '1px solid #E2E8F0' }}>
+                        <img src={getVehiclePhoto(viewingContract.vehicles)} style={{width:'100%', height:'100%', objectFit:'cover'}}/>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>{viewingContract.vehicles?.brand} {viewingContract.vehicles?.model}</div>
+                        <span style={{ fontSize: 13, background: '#0F172A', color: 'white', padding: '2px 8px', borderRadius: 4, fontWeight: 700, fontFamily: 'monospace' }}>{viewingContract.vehicles?.plate}</span>
+                        <div style={{ fontSize: 13, color: '#64748B', marginTop: 4 }}>KM Salida: {viewingContract.km_start || '---'}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Condiciones */}
+                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E2E8F0', padding: 24 }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <MapPin size={16}/> Itinerario y Plan
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <Calendar size={18} color="#94A3B8"/>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{new Date(viewingContract.start_datetime).toLocaleString()}</div>
+                          <div style={{ fontSize: 12, color: '#64748B' }}>Fecha de Salida</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <Clock size={18} color="#94A3B8"/>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{new Date(viewingContract.end_datetime_planned).toLocaleString()}</div>
+                          <div style={{ fontSize: 12, color: '#64748B' }}>Fecha de Retorno Pactada</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <MapPin size={18} color="#94A3B8"/>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{viewingContract.trip_destination || 'No especificado'}</div>
+                          <div style={{ fontSize: 12, color: '#64748B' }}>Destino Previsto</div>
+                        </div>
+                      </div>
+                      <div style={{ marginTop: 8, padding: 12, background: '#F8FAFC', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+                        <div style={{ fontSize: 12, color: '#64748B', fontWeight: 700 }}>PLAN SELECCIONADO</div>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', textTransform: 'capitalize' }}>{viewingContract.plan}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Columna Derecha: Pagos y Archivos */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  
+                  {/* Resumen Económico */}
+                  <div style={{ background: '#0F172A', borderRadius: 12, padding: 24, color: 'white' }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 20 }}>Estado Financiero</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 14, color: '#94A3B8' }}>Total Contrato</span>
+                        <span style={{ fontSize: 20, fontWeight: 800, color: '#22C55E' }}>S/ {parseFloat(viewingContract.total_amount || 0).toFixed(2)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 14, color: '#94A3B8' }}>Abono Reserva</span>
+                        <span style={{ fontSize: 16, fontWeight: 700 }}>S/ {parseFloat(viewingContract.reservation_paid_amount || 0).toFixed(2)}</span>
+                      </div>
+                      <div style={{ height: 1, background: '#334155' }}></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 14, color: '#94A3B8' }}>Saldo Pendiente</span>
+                        <span style={{ fontSize: 24, fontWeight: 800, color: (viewingContract.total_amount - viewingContract.reservation_paid_amount) > 0 ? '#F59E0B' : '#22C55E' }}>
+                          S/ {(viewingContract.total_amount - viewingContract.reservation_paid_amount).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Archivos y Fotos */}
+                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E2E8F0', padding: 24 }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: 16 }}>Evidencia y Documentos</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      {viewingContract.photo_start_url ? (
+                        <div style={{ border: '1px solid #E2E8F0', borderRadius: 8, padding: 8, textAlign: 'center' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 6 }}>FOTO SALIDA</div>
+                          <img src={viewingContract.photo_start_url} style={{ width: '100%', height: 80, objectFit: 'cover', borderRadius: 4, cursor: 'pointer' }} onClick={()=>window.open(viewingContract.photo_start_url)}/>
+                        </div>
+                      ) : (
+                        <div style={{ border: '1px dashed #E2E8F0', borderRadius: 8, padding: 16, textAlign: 'center', color: '#94A3B8', fontSize: 12 }}>Sin foto salida</div>
+                      )}
+                      
+                      {viewingContract.photo_end_url ? (
+                        <div style={{ border: '1px solid #E2E8F0', borderRadius: 8, padding: 8, textAlign: 'center' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 6 }}>FOTO LLEGADA</div>
+                          <img src={viewingContract.photo_end_url} style={{ width: '100%', height: 80, objectFit: 'cover', borderRadius: 4, cursor: 'pointer' }} onClick={()=>window.open(viewingContract.photo_end_url)}/>
+                        </div>
+                      ) : (
+                        <div style={{ border: '1px dashed #E2E8F0', borderRadius: 8, padding: 16, textAlign: 'center', color: '#94A3B8', fontSize: 12 }}>Sin foto llegada</div>
+                      )}
+                    </div>
+
+                    <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <button className="btn btn-outline" style={{ width: '100%', display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', fontSize: 13 }} disabled={!viewingContract.pdf_contract_url}>
+                        <FileText size={16}/> Ver Contrato PDF
+                      </button>
+                      <button className="btn btn-outline" style={{ width: '100%', display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', fontSize: 13 }} disabled={!viewingContract.voucher_url}>
+                        <Receipt size={16}/> Ver Comprobante (S/N)
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div style={{ padding: '20px 32px', background: 'white', borderTop: '1px solid #E2E8F0', display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
+              <button className="btn btn-dark" onClick={()=>setViewingContract(null)}>Cerrar Vista</button>
+            </div>
+
           </div>
         </div>
       )}
